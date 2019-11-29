@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>My New Hugo Site</title>
+    <link>http://example.org/</link>
+    <description>Recent content on My New Hugo Site</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Wed, 09 Oct 2019 10:20:22 +0700</lastBuildDate>
+    
+	<atom:link href="http://example.org/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Hello World</title>
+      <link>http://example.org/posts/hello-world/</link>
+      <pubDate>Wed, 09 Oct 2019 10:20:22 +0700</pubDate>
+      
+      <guid>http://example.org/posts/hello-world/</guid>
+      <description>Hello Hello world from Hugo</description>
+    </item>
+    
+    <item>
+      <title>naive_ner</title>
+      <link>http://example.org/posts/naive_ner/</link>
+      <pubDate>Wed, 09 Oct 2019 10:20:22 +0700</pubDate>
+      
+      <guid>http://example.org/posts/naive_ner/</guid>
+      <description>Named Entity Recognition Data is taken from https://www.kaggle.com/abhinavwalia95/entity-annotated-corpus
+Some reference: * https://www.aclweb.org/anthology/W03-0423.pdf, * https://towardsdatascience.com/named-entity-recognition-and-classification-with-scikit-learn-f05372f07ba2, * https://mattshomepage.com/articles/2016/May/23/nltk_nec/
+import os import sys import nltk import pandas as pd import numpy as np from tqdm import tqdm from tqdm import tnrange, tqdm_notebook tqdm.pandas () from sklearn.metrics import confusion_matrix, accuracy_score, recall_score, precision_score, precision_recall_fscore_support  path_data = os.path.abspath (&#39;../../data/ukdw-2&#39;) data = pd.read_csv (os.path.join (path_data, &#39;ner_sample.csv&#39;), encoding=&#39;latin&#39;) # fill the NaN value with the previously seen value data[&amp;quot;Sentence #&amp;quot;] = data[&amp;quot;Sentence #&amp;quot;].</description>
+    </item>
+    
+  </channel>
+</rss>

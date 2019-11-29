@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="en" itemscope itemtype="http://schema.org/WebPage">
+  <head>
+    
+
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+
+  <title>naive_ner - My New Hugo Site</title>
+  <meta name="description" content="Named Entity Recognition Data is taken from https://www.kaggle.com/abhinavwalia95/entity-annotated-corpus
+Some reference: * https://www.aclweb.org/anthology/W03-0423.pdf, * https://towardsdatascience.com/named-entity-recognition-and-classification-with-scikit-learn-f05372f07ba2, * https://mattshomepage.com/articles/2016/May/23/nltk_nec/
+import os import sys import nltk import pandas as pd import numpy as np from tqdm import tqdm from tqdm import tnrange, tqdm_notebook tqdm.pandas () from sklearn.metrics import confusion_matrix, accuracy_score, recall_score, precision_score, precision_recall_fscore_support  path_data = os.path.abspath (&#39;../../data/ukdw-2&#39;) data = pd.read_csv (os.path.join (path_data, &#39;ner_sample.csv&#39;), encoding=&#39;latin&#39;) # fill the NaN value with the previously seen value data[&quot;Sentence #&quot;] = data[&quot;Sentence #&quot;]."><script type="application/ld+json">
+{
+    "@context": "http://schema.org",
+    "@type": "WebSite",
+    "name": "My New Hugo Site",
+    
+    "url": "http:\/\/example.org\/"
+}
+</script><script type="application/ld+json">
+{
+  "@context": "http://schema.org",
+  "@type": "Organization",
+  "name": "",
+  "url": "http:\/\/example.org\/"
+  
+  
+  
+  
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "http://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [{
+        "@type": "ListItem",
+        "position": 1,
+        "item": {
+          "@id": "http:\/\/example.org\/",
+          "name": "home"
+        }
+    },{
+        "@type": "ListItem",
+        "position": 3,
+        "item": {
+          "@id": "http:\/\/example.org\/posts\/naive_ner\/",
+          "name": "Naive ner"
+        }
+    }]
+}
+</script><script type="application/ld+json">
+{
+  "@context": "http://schema.org",
+  "@type": "Article",
+  "author": {
+    "name" : ""
+  },
+  "headline": "naive_ner",
+  "description" : "Named Entity Recognition Data is taken from https:\/\/www.kaggle.com\/abhinavwalia95\/entity-annotated-corpus\nSome reference: * https:\/\/www.aclweb.org\/anthology\/W03-0423.pdf, * https:\/\/towardsdatascience.com\/named-entity-recognition-and-classification-with-scikit-learn-f05372f07ba2, * https:\/\/mattshomepage.com\/articles\/2016\/May\/23\/nltk_nec\/\nimport os import sys import nltk import pandas as pd import numpy as np from tqdm import tqdm from tqdm import tnrange, tqdm_notebook tqdm.pandas () from sklearn.metrics import confusion_matrix, accuracy_score, recall_score, precision_score, precision_recall_fscore_support  path_data = os.path.abspath (\x27..\/..\/data\/ukdw-2\x27) data = pd.read_csv (os.path.join (path_data, \x27ner_sample.csv\x27), encoding=\x27latin\x27) # fill the NaN value with the previously seen value data[\x26quot;Sentence #\x26quot;] = data[\x26quot;Sentence #\x26quot;].",
+  "inLanguage" : "en",
+  "wordCount":  684 ,
+  "datePublished" : "2019-10-09T10:20:22",
+  "dateModified" : "2019-10-09T10:20:22",
+  "image" : "http:\/\/example.org\/",
+  "keywords" : [ "" ],
+  "mainEntityOfPage" : "http:\/\/example.org\/posts\/naive_ner\/",
+  "publisher" : {
+    "@type": "Organization",
+    "name" : "http:\/\/example.org\/",
+    "logo" : {
+        "@type" : "ImageObject",
+        "url" : "http:\/\/example.org\/",
+        "height" :  60 ,
+        "width" :  60
+    }
+  }
+}
+</script>
+
+<meta property="og:title" content="naive_ner" />
+<meta property="og:description" content="Named Entity Recognition Data is taken from https://www.kaggle.com/abhinavwalia95/entity-annotated-corpus
+Some reference: * https://www.aclweb.org/anthology/W03-0423.pdf, * https://towardsdatascience.com/named-entity-recognition-and-classification-with-scikit-learn-f05372f07ba2, * https://mattshomepage.com/articles/2016/May/23/nltk_nec/
+import os import sys import nltk import pandas as pd import numpy as np from tqdm import tqdm from tqdm import tnrange, tqdm_notebook tqdm.pandas () from sklearn.metrics import confusion_matrix, accuracy_score, recall_score, precision_score, precision_recall_fscore_support  path_data = os.path.abspath (&#39;../../data/ukdw-2&#39;) data = pd.read_csv (os.path.join (path_data, &#39;ner_sample.csv&#39;), encoding=&#39;latin&#39;) # fill the NaN value with the previously seen value data[&quot;Sentence #&quot;] = data[&quot;Sentence #&quot;].">
+<meta property="og:url" content="http://example.org/posts/naive_ner/" />
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="My New Hugo Site" />
+
+  <meta name="twitter:title" content="naive_ner" />
+  <meta name="twitter:description" content="Named Entity Recognition Data is taken from https://www.kaggle.com/abhinavwalia95/entity-annotated-corpus
+Some reference: * https://www.aclweb.org/anthology/W03-0423.pdf, * …">
+  <meta name="twitter:card" content="summary" />
+  <meta name="generator" content="Hugo 0.57.0" />
+  <link rel="alternate" href="http://example.org/index.xml" type="application/rss+xml" title="My New Hugo Site"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css" integrity="sha384-9eLZqc9ds8eNjO3TmqPeYcDj8n+Qfa4nuSiGYa6DjLNcv9BtN69ZIulL9+8CqC9Y" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.5.0/css/all.css" integrity="sha384-B4dIYHKNBt8Bc12p+WXckhzcICo0wtJAoU8YZTY5qE0Id1GSseTk6S+L3BlXeVIU" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous"><link rel="stylesheet" href="http://example.org/css/main.css" /><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800" /><link rel="stylesheet" href="http://example.org/css/syntax.css" /><link rel="stylesheet" href="http://example.org/css/codeblock.css" /><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/photoswipe/4.1.2/photoswipe.min.css" integrity="sha384-h/L2W9KefUClHWaty3SLE5F/qvc4djlyR4qY3NUV5HGQBBW7stbcfff1+I/vmsHh" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/photoswipe/4.1.2/default-skin/default-skin.min.css" integrity="sha384-iD0dNku6PYSIQLyfTOpB06F2KCZJAKLOThS5HRe8b3ibhdEQ6eKsFf/EeFxdOt5R" crossorigin="anonymous">
+
+
+
+  </head>
+  <body>
+    <nav class="navbar navbar-default navbar-fixed-top navbar-custom">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#main-navbar">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="http://example.org/">My New Hugo Site</a>
+    </div>
+
+    <div class="collapse navbar-collapse" id="main-navbar">
+      <ul class="nav navbar-nav navbar-right">
+        
+
+        
+
+        
+      </ul>
+    </div>
+
+    
+
+  </div>
+</nav>
+
+
+
+
+    
+
+
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+<div class="pswp__bg"></div>
+
+<div class="pswp__scroll-wrap">
+    
+    <div class="pswp__container">
+      <div class="pswp__item"></div>
+      <div class="pswp__item"></div>
+      <div class="pswp__item"></div>
+    </div>
+    
+    <div class="pswp__ui pswp__ui--hidden">
+    <div class="pswp__top-bar">
+      
+      <div class="pswp__counter"></div>
+      <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+      <button class="pswp__button pswp__button--share" title="Share"></button>
+      <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+      <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+      
+      
+      <div class="pswp__preloader">
+        <div class="pswp__preloader__icn">
+          <div class="pswp__preloader__cut">
+            <div class="pswp__preloader__donut"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+      <div class="pswp__share-tooltip"></div>
+    </div>
+    <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+    </button>
+    <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+    </button>
+    <div class="pswp__caption">
+      <div class="pswp__caption__center"></div>
+    </div>
+    </div>
+    </div>
+</div>
+
+
+  
+  
+  
+
+
+
+
+
+
+  
+
+  <header class="header-section ">
+    
+    <div class="intro-header no-img">
+      <div class="container">
+        <div class="row">
+          <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+            <div class="posts-heading">
+              
+                <h1>naive_ner</h1>
+              
+              
+                <hr class="small">
+              
+              
+              
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+
+    
+<div class="container" role="main">
+  <div class="row">
+    <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+      <article role="main" class="blog-post">
+        
+
+<h2 id="named-entity-recognition">Named Entity Recognition</h2>
+
+<p>Data is taken from <a href="https://www.kaggle.com/abhinavwalia95/entity-annotated-corpus">https://www.kaggle.com/abhinavwalia95/entity-annotated-corpus</a></p>
+
+<p>Some reference:
+* <a href="https://www.aclweb.org/anthology/W03-0423.pdf">https://www.aclweb.org/anthology/W03-0423.pdf</a>,
+* <a href="https://towardsdatascience.com/named-entity-recognition-and-classification-with-scikit-learn-f05372f07ba2">https://towardsdatascience.com/named-entity-recognition-and-classification-with-scikit-learn-f05372f07ba2</a>,
+* <a href="https://mattshomepage.com/articles/2016/May/23/nltk_nec/">https://mattshomepage.com/articles/2016/May/23/nltk_nec/</a></p>
+
+<pre><code class="language-python">import os
+import sys
+
+import nltk
+import pandas as pd
+import numpy as np
+from tqdm import tqdm
+from tqdm import tnrange, tqdm_notebook
+tqdm.pandas ()
+from sklearn.metrics import confusion_matrix, accuracy_score, recall_score, precision_score, precision_recall_fscore_support
+</code></pre>
+
+<pre><code class="language-python">path_data = os.path.abspath ('../../data/ukdw-2')
+data = pd.read_csv (os.path.join (path_data, 'ner_sample.csv'), encoding='latin')
+
+# fill the NaN value with the previously seen value
+data[&quot;Sentence #&quot;] = data[&quot;Sentence #&quot;].fillna (method=&quot;ffill&quot;)
+data.head (5)
+</code></pre>
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Sentence #</th>
+      <th>Word</th>
+      <th>POS</th>
+      <th>Tag</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>Sentence: 2</td>
+      <td>Families</td>
+      <td>NNS</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>Sentence: 2</td>
+      <td>of</td>
+      <td>IN</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>Sentence: 2</td>
+      <td>soldiers</td>
+      <td>NNS</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>Sentence: 2</td>
+      <td>killed</td>
+      <td>VBN</td>
+      <td>O</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>Sentence: 2</td>
+      <td>in</td>
+      <td>IN</td>
+      <td>O</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+<pre><code class="language-python">print (&quot;Unique Tag&quot;)
+print (&quot;\n&quot;.join (sorted (set (data[&quot;Tag&quot;]))))
+</code></pre>
+
+<pre><code>Unique Tag
+B-art
+B-eve
+B-geo
+B-gpe
+B-nat
+B-org
+B-per
+B-tim
+I-art
+I-eve
+I-geo
+I-gpe
+I-nat
+I-org
+I-per
+I-tim
+O
+</code></pre>
+
+<pre><code class="language-python">&quot;&quot;&quot;
+# if you want to analyze person only
+data['Tag'] = data['Tag'].apply (lambda f: f if f in ('B-per', 'I-per') else 'O')
+print (&quot;Unique Tag&quot;)
+print (&quot;\n&quot;.join (sorted (set (data[&quot;Tag&quot;]))))
+&quot;&quot;&quot;
+</code></pre>
+
+<pre><code class="language-python"># get prev word
+data['prev_word'] = data['Word'].shift (periods=1, fill_value='__start__')
+
+# add __start__ for each sentence start
+sentence_list = data['Sentence #'].tolist ()
+prev_word = data['prev_word'].tolist ()
+for idx in tqdm (range (1, len (sentence_list))):
+    if sentence_list[idx-1] != sentence_list[idx]:
+        prev_word[idx] = '__start__'
+
+# reupdate prev_word
+data['prev_word'] = prev_word
+</code></pre>
+
+<pre><code>100%|██████████| 119503/119503 [00:00&lt;00:00, 1486933.53it/s]
+</code></pre>
+
+<pre><code class="language-python"># extract feature
+def extract(d):
+    feature = {
+        &quot;word&quot; : d[&quot;Word&quot;]    
+    }
+    return feature
+data[&quot;feature&quot;] = data.apply (extract, axis=1)
+data.head (5)
+</code></pre>
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Sentence #</th>
+      <th>Word</th>
+      <th>POS</th>
+      <th>Tag</th>
+      <th>prev_word</th>
+      <th>feature</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>Sentence: 2</td>
+      <td>Families</td>
+      <td>NNS</td>
+      <td>O</td>
+      <td>__start__</td>
+      <td>{'word': 'Families'}</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>Sentence: 2</td>
+      <td>of</td>
+      <td>IN</td>
+      <td>O</td>
+      <td>Families</td>
+      <td>{'word': 'of'}</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>Sentence: 2</td>
+      <td>soldiers</td>
+      <td>NNS</td>
+      <td>O</td>
+      <td>of</td>
+      <td>{'word': 'soldiers'}</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>Sentence: 2</td>
+      <td>killed</td>
+      <td>VBN</td>
+      <td>O</td>
+      <td>soldiers</td>
+      <td>{'word': 'killed'}</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>Sentence: 2</td>
+      <td>in</td>
+      <td>IN</td>
+      <td>O</td>
+      <td>killed</td>
+      <td>{'word': 'in'}</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+<pre><code class="language-python"># create a maxent bayes classifier
+# classifier = nltk.classify.MaxentClassifier.train(data[[&quot;feature&quot;, &quot;Tag&quot;]].values)
+
+# create a naive bayes classifier
+classifier = nltk.classify.NaiveBayesClassifier.train(data[[&quot;feature&quot;, &quot;Tag&quot;]].values)
+</code></pre>
+
+<pre><code class="language-python"># most important feature
+classifier.show_most_informative_features (20)
+</code></pre>
+
+<pre><code>Most Informative Features
+                    word = 'President'     B-per : O      =    609.7 : 1.0
+                    word = 'French'        B-gpe : O      =    543.5 : 1.0
+                    word = 'Pakistan'      B-geo : O      =    516.2 : 1.0
+                    word = 'Union'         I-org : O      =    390.3 : 1.0
+                    word = 'the'               O : B-tim  =    332.7 : 1.0
+                    word = 'Ministry'      I-org : O      =    279.9 : 1.0
+                    word = 'Prime'         B-per : O      =    262.2 : 1.0
+                    word = 'U.S.'          B-geo : B-per  =    247.2 : 1.0
+                    word = 'York'          I-geo : O      =    205.0 : 1.0
+                    word = 'General'       B-per : O      =    162.3 : 1.0
+                    word = 'American'      B-gpe : O      =    144.7 : 1.0
+                    word = '2004'          I-tim : O      =    142.3 : 1.0
+                    word = 'King'          B-per : O      =    141.6 : 1.0
+                    word = 'Barack'        I-per : O      =    140.5 : 1.0
+                    word = 'New'           B-geo : O      =    137.1 : 1.0
+                    word = 'Tehran'        B-geo : O      =    136.2 : 1.0
+                    word = 'Senator'       B-per : O      =    126.2 : 1.0
+                    word = 'Supreme'       B-org : O      =    123.4 : 1.0
+                    word = 'and'               O : B-tim  =    117.7 : 1.0
+                    word = 'Iraq'          B-geo : B-gpe  =    115.8 : 1.0
+</code></pre>
+
+<pre><code class="language-python">word = {&quot;word&quot; : &quot;Obama&quot;}
+classifier.classify (word)
+</code></pre>
+
+<pre><code>'I-per'
+</code></pre>
+
+<pre><code class="language-python">def extract_ner (text):
+    for t in text.split ():
+        feat = {&quot;word&quot; : t}
+        print (&quot;{}/{}&quot;.format (t, classifier.classify (feat)), end=' ')
+
+extract_ner (&quot;President Joko Widodo visit Netherlands for discussing global warming&quot;)
+</code></pre>
+
+<pre><code>President/B-per Joko/O Widodo/O visit/O Netherlands/B-geo for/O discussing/O global/O warming/O 
+</code></pre>
+
+<pre><code class="language-python">data['predicted'] = data['feature'].apply (classifier.classify)
+</code></pre>
+
+<pre><code class="language-python"># various matrices
+accuracy = accuracy_score (data['Tag'], data['predicted'])
+labels = list (set (data['Tag']))
+precision, recall, fscore, support = precision_recall_fscore_support (data['Tag'], data['predicted'], labels=labels)
+</code></pre>
+
+<pre><code class="language-python">prec = list (zip (labels, recall))
+prec
+</code></pre>
+
+<pre><code>[('I-tim', 0.024279210925644917),
+ ('B-tim', 0.7874648453194054),
+ ('O', 0.9985449450312567),
+ ('B-org', 0.3798348544111256),
+ ('B-art', 0.0),
+ ('I-nat', 0.0),
+ ('I-eve', 0.0),
+ ('B-per', 0.8242857142857143),
+ ('I-art', 0.0),
+ ('I-per', 0.8811494611900672),
+ ('B-nat', 0.0),
+ ('I-gpe', 0.0),
+ ('B-gpe', 0.9204604918890633),
+ ('I-org', 0.3517915309446254),
+ ('B-eve', 0.0),
+ ('I-geo', 0.43258426966292135),
+ ('B-geo', 0.893049499871762)]
+</code></pre>
+
+
+        
+
+        
+
+        
+      </article>
+
+      
+        <ul class="pager blog-pager">
+          
+          
+            <li class="next">
+              <a href="http://example.org/posts/hello-world/" data-toggle="tooltip" data-placement="top" title="Hello World">Next Post &rarr;</a>
+            </li>
+          
+        </ul>
+      
+
+
+      
+
+    </div>
+  </div>
+</div>
+
+      
+<footer>
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+        <ul class="list-inline text-center footer-links">
+          
+          
+        </ul>
+        <p class="credits copyright text-muted">
+          
+
+          &nbsp;&bull;&nbsp;&copy;
+          
+            2019
+          
+
+          
+            &nbsp;&bull;&nbsp;
+            <a href="http://example.org/">My New Hugo Site</a>
+          
+        </p>
+        
+        <p class="credits theme-by text-muted">
+          <a href="https://gohugo.io">Hugo v0.57.0</a> powered &nbsp;&bull;&nbsp; Theme <a href="https://github.com/halogenica/beautifulhugo">Beautiful Hugo</a> adapted from <a href="https://deanattali.com/beautiful-jekyll/">Beautiful Jekyll</a>
+          
+        </p>
+      </div>
+    </div>
+  </div>
+</footer><script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.js" integrity="sha384-K3vbOmF2BtaVai+Qk37uypf7VrgBubhQreNQe9aGsz9lB63dIFiQVlJbr92dw2Lx" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/contrib/auto-render.min.js" integrity="sha384-kmZOZB5ObwgQnS/DuDg6TScgOiWWBiVt0plIRkZCmE6rDZGrEOQeHM5PcHi+nyqe" crossorigin="anonymous"></script>
+<script src="https://code.jquery.com/jquery-1.12.4.min.js" integrity="sha256-ZosEbRLbNQzLpnKIkEdrPv7lOy9C27hHQ+Xp8a4MxAQ=" crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+<script src="http://example.org/js/main.js"></script><script> renderMathInElement(document.body); </script><script src="https://cdnjs.cloudflare.com/ajax/libs/photoswipe/4.1.2/photoswipe.min.js" integrity="sha384-QELNnmcmU8IR9ZAykt67vGr9/rZJdHbiWi64V88fCPaOohUlHCqUD/unNN0BXSqy" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/photoswipe/4.1.2/photoswipe-ui-default.min.js" integrity="sha384-m67o7SkQ1ALzKZIFh4CiTA8tmadaujiTa9Vu+nqPSwDOqHrDmxLezTdFln8077+q" crossorigin="anonymous"></script><script src="http://example.org/js/load-photoswipe.js"></script>
+
+
+
+
+
+
+
+
+
+    
+  </body>
+</html>
+
