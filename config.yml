@@ -2,3 +2,6 @@
 theme: mine
 title: Adib.notes
 languageCode: en-us
+markup:
+  highlight:
+    style: github 
