@@ -1,7 +1,9 @@
 # baseURL: https://adibpr.github.io/
+relativeURLS: true
+canonifyurls: true
 theme: mine
 title: Adib.notes
 languageCode: en-us
 markup:
   highlight:
-    style: github 
+      style: monokai
