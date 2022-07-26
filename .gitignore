@@ -2,3 +2,4 @@ public/
 content/
 content
 **/log/
+.hugo_build.lock
