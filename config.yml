@@ -7,3 +7,5 @@ languageCode: en-us
 markup:
   highlight:
       style: monokai
+ignoreFiles:
+    - "notebook/.*"
