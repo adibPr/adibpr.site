@@ -6,6 +6,6 @@ title: Adib.notes
 languageCode: en-us
 markup:
   highlight:
-      style: monokai
+      noclasses: false
 ignoreFiles:
     - "notebook/.*"
